@@ -11,6 +11,7 @@ eshell/
 straight/build*/
 straight/repos/
 straight/versions/
+straight/build-cache.el
 
 # History / local state
 history

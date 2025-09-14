@@ -166,6 +166,11 @@
     (define-key evil-normal-state-map (kbd "C-n") #'evil-mc-make-and-goto-next-match)
     (define-key evil-normal-state-map (kbd "C-p") #'evil-mc-make-and-goto-prev-match)))
 
+(use-package evil-commentary
+  :after evil
+  :config
+  (evil-commentary-mode))
+
 ;;; --- Iedit + Evil-friendly entry ------------------------------------------
 (use-package iedit
   :bind (("C-;" . iedit-mode))
