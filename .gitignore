@@ -1,0 +1,20 @@
+# Byte-compiled / cache files
+eln-cache/
+transient/
+tree-sitter/
+url/
+var/
+emacs-backup/
+eshell/
+
+# Straight.el build artifacts
+straight/build*/
+straight/repos/
+straight/versions/
+
+# History / local state
+history
+.mc-lists.el
+
+# Auto-generated files
+custom.el
