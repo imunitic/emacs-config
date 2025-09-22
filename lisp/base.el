@@ -2,8 +2,7 @@
   :init (progn (load-theme 'ample t t)
                (load-theme 'ample-flat t t)
                (load-theme 'ample-light t t)
-               (enable-theme 'ample-flat))
-  :defer t)
+               (enable-theme 'ample-flat)))
 
 (use-package exec-path-from-shell
   :if (memq window-system '(mac ns x))
@@ -31,7 +30,6 @@
 
 ;; base.el
 (use-package eglot
-  :defer t
   :hook
   ;; Add Eglot to general prog-mode (but you can restrict if you prefer)
   ((c-mode c++-mode python-mode rust-mode go-mode) . eglot-ensure)
@@ -103,9 +101,11 @@
   (global-corfu-mode))
 
 ;; consult
-(use-package consult :bind (("C-s" . consult-line)
-                            ("C-x b" . consult-buffer)
-                            ("M-g g" . consult-goto-line)))
+(use-package consult
+  :bind (("C-s" . consult-line)
+         ("C-x b" . consult-buffer)
+         ("M-g g" . consult-goto-line)
+	 ("M-y" . consult-yank-pop)))
 
 ;; elfeed
 (use-package elfeed
