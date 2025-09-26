@@ -151,20 +151,29 @@
   (evil-collection-init))
 
 ;;; --- Multiple cursors (Evil-native) ---------------------------------------
+;; Evil-MC essentials under SPC m (mode/local leader) and some globals
 (use-package evil-mc
   :after evil
-  :commands
-  (evil-mc-make-all-cursors evil-mc-undo-all-cursors
-   evil-mc-make-and-goto-next-match evil-mc-make-and-goto-prev-match
-   evil-mc-make-cursor-in-visual-selection-end)
-  :init
-  (with-eval-after-load 'evil
-    (global-evil-mc-mode 1)
-    (define-key evil-normal-state-map (kbd "g m") #'evil-mc-make-all-cursors)
-    (define-key evil-normal-state-map (kbd "g M") #'evil-mc-undo-all-cursors)
-    (define-key evil-visual-state-map (kbd "g m") #'evil-mc-make-cursor-in-visual-selection-end)
-    (define-key evil-normal-state-map (kbd "C-n") #'evil-mc-make-and-goto-next-match)
-    (define-key evil-normal-state-map (kbd "C-p") #'evil-mc-make-and-goto-prev-match)))
+  :hook (prog-mode . evil-mc-mode)
+  :config
+  ;; your earlier picks (kept)
+  (define-key evil-normal-state-map (kbd "g m") #'evil-mc-make-all-cursors)
+  (define-key evil-normal-state-map (kbd "g M") #'evil-mc-undo-all-cursors)
+  (define-key evil-visual-state-map (kbd "g m") #'evil-mc-make-cursor-in-visual-selection-end)
+  (define-key evil-normal-state-map (kbd "C-n") #'evil-mc-make-and-goto-next-match)
+  (define-key evil-normal-state-map (kbd "C-p") #'evil-mc-make-and-goto-prev-match)
+
+  ;; add skip on g s / g S (so you keep xref C-t intact)
+  (define-key evil-normal-state-map (kbd "g s") #'evil-mc-skip-and-goto-next-match)
+  (define-key evil-normal-state-map (kbd "g S") #'evil-mc-skip-and-goto-prev-match)
+
+  ;; local-leader shortcuts for MC workflows
+  (my/local-leader
+    "m"  '(:ignore t :which-key "multi-cursor")
+    "mm" '(evil-mc-make-all-cursors :which-key "make all")
+    "ms" '(evil-mc-skip-and-goto-next-match :which-key "skip →")
+    "mS" '(evil-mc-skip-and-goto-prev-match :which-key "skip ←")
+    "mq" '(evil-mc-undo-all-cursors :which-key "clear")))
 
 (use-package evil-commentary
   :after evil
@@ -225,7 +234,83 @@
   :custom
   (idle-highlight-idle-time 0.25)     ;; delay before highlighting
   (idle-highlight-inhibit-commands '(keyboard-quit)) ; don’t flash after quit
-)
+  )
+
+(use-package general
+  :after evil
+  :config
+  ;; Global leader (Space) and a "mode" leader (SPC m)
+  (general-create-definer my/leader
+    :states '(normal visual emacs)
+    :prefix "SPC"
+    :non-normal-prefix "M-SPC")
+
+  (general-create-definer my/local-leader
+    :states '(normal visual emacs)
+    :prefix "SPC m"
+    :non-normal-prefix "M-SPC m")
+
+  ;; ========== FILES (SPC f) ==========
+  (my/leader
+    "f"   '(:ignore t :which-key "files")
+    "ff"  '(find-file         :which-key "find file")
+    "fr"  '(recentf-open-files:which-key "recent files")
+    "fs"  '(save-buffer       :which-key "save"))
+
+  ;; ========== BUFFERS (SPC b) ==========
+  (my/leader
+    "b"   '(:ignore t :which-key "buffers")
+    "bb"  '(switch-to-buffer  :which-key "switch")
+    "bd"  '(kill-this-buffer  :which-key "kill (keep window)")
+    "bn"  '(next-buffer       :which-key "next")
+    "bp"  '(previous-buffer   :which-key "prev")
+    "by"  '(consult-yank-pop  :which-key "yank ring search")) ; uses consult+corfu
+
+  ;; ========== WINDOWS (SPC w) ==========
+  (my/leader
+    "w"   '(:ignore t :which-key "windows")
+    "ws"  '(split-window-below    :which-key "split below")
+    "wv"  '(split-window-right    :which-key "split right")
+    "wd"  '(delete-window         :which-key "delete window")
+    "wo"  '(delete-other-windows  :which-key "only this")
+    "wh"  '(windmove-left         :which-key "←")
+    "wj"  '(windmove-down         :which-key "↓")
+    "wk"  '(windmove-up           :which-key "↑")
+    "wl"  '(windmove-right        :which-key "→"))
+
+  ;; ========== GIT / MAGIT (SPC g) ==========
+  (my/leader
+    "g"   '(:ignore t :which-key "git")
+    "gs"  '(magit-status          :which-key "status")
+    "gc"  '(magit-commit-create   :which-key "commit")
+    "gp"  '(magit-push-current-to-pushremote :which-key "push")
+    "gP"  '(magit-pull-from-upstream         :which-key "pull")
+    "gb"  '(magit-branch-checkout :which-key "checkout branch"))
+
+  ;; ========== SEARCH / XREF (SPC s) ==========
+  (my/leader
+    "s"   '(:ignore t :which-key "search")
+    "ss"  '(isearch-forward       :which-key "isearch")
+    "sp"  '(project-find-file     :which-key "project file")
+    "sd"  '(xref-find-definitions :which-key "go to def")
+    "sr"  '(xref-find-references  :which-key "references"))
+
+  ;; ========== COMMENT (SPC c) ==========
+  ;; Works if you enabled either evil-commentary or evil-nerd-commenter.
+  (my/leader
+    "c"   '(:ignore t :which-key "comment")
+    "cc"  '(evil-commentary-line  :which-key "toggle line")   ;; or evilnc-comment-or-uncomment-lines
+    "c SPC" '(evil-commentary     :which-key "operator")))    ;; or evilnc-comment-operator
+
+;; -------- OPTIONAL: editing helpers you asked about --------
+;; Drag lines/regions (pair with earlier suggestion)
+(use-package drag-stuff
+  :config
+  (drag-stuff-global-mode 1)
+  (my/leader
+    "e"   '(:ignore t :which-key "edit")
+    "ej"  '(drag-stuff-down :which-key "move line/region ↓")
+    "ek"  '(drag-stuff-up   :which-key "move line/region ↑")))
 
 ;; Tip: ensure ripgrep is installed so dumb-jump is fast:
 ;;   macOS (brew):  brew install ripgrep
