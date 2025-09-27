@@ -236,6 +236,17 @@
   (idle-highlight-inhibit-commands '(keyboard-quit)) ; don’t flash after quit
   )
 
+(defun my/vterm-split (&optional arg)
+  "Open vterm in a split.
+With no ARG, split vertically (right).
+With C-u ARG, split horizontally (below)."
+  (interactive "P")
+  (if arg
+      (split-window-below)
+    (split-window-right))
+  (other-window 1)
+  (vterm))
+
 (use-package general
   :after evil
   :config
@@ -294,6 +305,10 @@
     "sp"  '(project-find-file     :which-key "project file")
     "sd"  '(xref-find-definitions :which-key "go to def")
     "sr"  '(xref-find-references  :which-key "references"))
+
+  (my/leader
+    "o"   '(:ignore t :which-key "open")
+    "ot"  '(my/vterm-split :which-key "open vterm in split"))
 
   ;; ========== COMMENT (SPC c) ==========
   ;; Works if you enabled either evil-commentary or evil-nerd-commenter.
