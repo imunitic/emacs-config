@@ -28,6 +28,43 @@
            :map magit-hunk-section-map
            ("RET" . magit-diff-visit-file-other-window)))
 
+;; Ediff: make merges painless (single frame, sane splits, auto-save)
+(use-package ediff
+  :straight (:type built-in)
+  :commands (ediff ediff-buffers ediff-files ediff-revision)
+  :config
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain   ; no extra frame
+        ediff-split-window-function 'split-window-horizontally   ; side-by-side
+        ;; If you prefer top/bottom, use: #'split-window-vertically
+        ediff-keep-variants nil
+        ediff-show-residual-diff t)
+  ;; Save and quit Ediff with one key if you like (optional):
+  (define-key ediff-mode-map (kbd "q") #'ediff-quit-and-save))
+
+;; smerge-mode: handy for small/straightforward conflicts inline
+(use-package smerge-mode
+  :straight (:type built-in)
+  :hook ((find-file . (lambda ()
+                        (save-excursion
+                          (goto-char (point-min))
+                          (when (re-search-forward "^<<<<<<< " nil t)
+                            (smerge-mode 1))))))
+  :init
+  ;; Evil-friendly motions for conflicts
+  (with-eval-after-load 'evil
+    (define-key smerge-mode-map (kbd "]c") #'smerge-next)
+    (define-key smerge-mode-map (kbd "[c") #'smerge-prev))
+  :config
+  ;; Optional: transient menu for smerge
+  (defun my/smerge-hydra ()
+    (interactive)
+    (message "smerge: [n]ext [p]rev | keep: [a]ll [b]ase [m]ine [o]ther [u]nion | [r]efine [e]diff [q]uit"))
+  (define-key smerge-mode-map (kbd "C-c m") #'my/smerge-hydra))
+
+(use-package magit-delta
+  :straight t
+  :hook (magit-mode . magit-delta-mode))
+
 ;; base.el
 (use-package eglot
   :hook
