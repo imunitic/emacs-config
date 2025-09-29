@@ -33,14 +33,12 @@
   :straight (:type built-in)
   :commands (ediff ediff-buffers ediff-files ediff-revision ediff-merge-files)
   :init
+  ;; Keep everything in one frame, side-by-side
   (setq ediff-window-setup-function #'ediff-setup-windows-plain
         ediff-split-window-function  #'split-window-horizontally
         ediff-merge-split-window-function #'split-window-horizontally
         ediff-keep-variants nil
-        ediff-show-residual-diff t)
-  :hook
-  (ediff-keymap-setup . (lambda ()
-                          (define-key ediff-mode-map (kbd "q") #'ediff-quit-and-save))))
+        ediff-show-residual-diff t))
 
 ;; smerge-mode: handy for small/straightforward conflicts inline
 (use-package smerge-mode
