@@ -31,15 +31,16 @@
 ;; Ediff: make merges painless (single frame, sane splits, auto-save)
 (use-package ediff
   :straight (:type built-in)
-  :commands (ediff ediff-buffers ediff-files ediff-revision)
-  :config
-  (setq ediff-window-setup-function 'ediff-setup-windows-plain   ; no extra frame
-        ediff-split-window-function 'split-window-horizontally   ; side-by-side
-        ;; If you prefer top/bottom, use: #'split-window-vertically
+  :commands (ediff ediff-buffers ediff-files ediff-revision ediff-merge-files)
+  :init
+  (setq ediff-window-setup-function #'ediff-setup-windows-plain
+        ediff-split-window-function  #'split-window-horizontally
+        ediff-merge-split-window-function #'split-window-horizontally
         ediff-keep-variants nil
         ediff-show-residual-diff t)
-  ;; Save and quit Ediff with one key if you like (optional):
-  (define-key ediff-mode-map (kbd "q") #'ediff-quit-and-save))
+  :hook
+  (ediff-keymap-setup . (lambda ()
+                          (define-key ediff-mode-map (kbd "q") #'ediff-quit-and-save))))
 
 ;; smerge-mode: handy for small/straightforward conflicts inline
 (use-package smerge-mode
@@ -61,8 +62,10 @@
     (message "smerge: [n]ext [p]rev | keep: [a]ll [b]ase [m]ine [o]ther [u]nion | [r]efine [e]diff [q]uit"))
   (define-key smerge-mode-map (kbd "C-c m") #'my/smerge-hydra))
 
+;; Nicer diff coloring. WARNING!!! needs git-delta installed
 (use-package magit-delta
   :straight t
+  :if (executable-find "delta") ;; only load if delta is available
   :hook (magit-mode . magit-delta-mode))
 
 ;; base.el
