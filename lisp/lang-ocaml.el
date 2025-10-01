@@ -5,26 +5,29 @@
   (exec-path-from-shell-copy-envs
    '("OPAM_SWITCH_PREFIX" "OCAML_TOPLEVEL_PATH" "CAML_LD_LIBRARY_PATH")))
 
+;; Prefer ocaml-ts-mode if available (Emacs 29+)
+(when (fboundp 'ocaml-ts-mode)
+  (add-to-list 'auto-mode-alist '("\\.ml\\'"  . ocaml-ts-mode))
+  (add-to-list 'auto-mode-alist '("\\.mli\\'" . ocaml-ts-mode)))
+
 ;; ocamlformat
 (use-package ocamlformat)
 
 ;; tuareg for older OCaml files
-(use-package tuareg
-  :hook (tuareg-mode . merlin-mode))
+(use-package tuareg)  ;; (no merlin hook)
 
-;; merlin (type info, jump to def, etc.)
+;; merlin installed but not auto-enabled (no hooks)
 (use-package merlin
-  :hook ((tuareg-mode . merlin-mode)
-         (caml-mode . merlin-mode)
-         (reason-mode . merlin-mode))
   :config
   (setq merlin-command "ocamlmerlin"))
 
 ;; ocaml-lsp with eglot
+(defvar eglot-server-programs nil)  ;; avoid "void variable" on add-to-list
 (use-package eglot
   :config
-  (add-to-list 'eglot-server-programs '(tuareg-mode . ("ocamllsp")))
-  (add-to-list 'eglot-server-programs '(reason-mode . ("ocamllsp"))))
+  (add-to-list 'eglot-server-programs '(tuareg-mode   . ("ocamllsp")))
+  (add-to-list 'eglot-server-programs '(ocaml-ts-mode . ("ocamllsp")))
+  (add-to-list 'eglot-server-programs '(reason-mode   . ("ocamllsp"))))
 
 ;; dune integration
 (use-package dune)
