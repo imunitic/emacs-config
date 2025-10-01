@@ -6,6 +6,7 @@ url/
 var/
 emacs-backup/
 eshell/
+elpa/
 
 # Straight.el build artifacts
 straight/build*/
