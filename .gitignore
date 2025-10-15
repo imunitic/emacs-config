@@ -8,6 +8,9 @@ emacs-backup/
 eshell/
 elpa/
 
+# Emacs TRAMP cache
+tramp
+
 # Straight.el build artifacts
 straight/build*/
 straight/repos/
