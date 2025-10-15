@@ -145,6 +145,28 @@
          ("M-g g" . consult-goto-line)
 	 ("M-y" . consult-yank-pop)))
 
+;; markdown
+
+;; In ~/.emacs.d/lisp/base.el
+(use-package markdown-mode
+  :mode (("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :init
+  ;; You can set this to your preferred Markdown processor (pandoc, markdown, etc.)
+  (setq markdown-command "pandoc --from markdown --to html5")
+  :config
+  ;; Enable line wrap, syntax highlighting inside code blocks, etc.
+  (setq markdown-fontify-code-blocks-natively t
+        markdown-enable-wiki-links t
+        markdown-italic-underscore t
+        markdown-asymmetric-header t
+        markdown-hide-urls nil
+        markdown-enable-math t)
+
+  ;; Keybinding to toggle live preview easily
+  (define-key markdown-mode-map (kbd "C-c C-p") 'markdown-live-preview-mode)
+  (define-key markdown-mode-map (kbd "C-c C-c") 'markdown-export))
+
 ;; elfeed
 (use-package elfeed
   :config
