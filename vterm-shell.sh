@@ -1,5 +1,31 @@
+#!/usr/bin/env zsh
 # emacs shell-side
 if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
+   if command -v realpath >/dev/null 2>&1; then
+       vterm_resolve_path() {
+           realpath "${1:-.}"
+       }
+   elif command -v python3 >/dev/null 2>&1; then
+       vterm_resolve_path() {
+           python3 - "${1:-.}" <<'PY'
+import os, sys
+print(os.path.realpath(sys.argv[1]))
+PY
+       }
+   elif command -v python >/dev/null 2>&1; then
+       vterm_resolve_path() {
+           python - "${1:-.}" <<'PY'
+import os, sys
+print(os.path.realpath(sys.argv[1]))
+PY
+       }
+   else
+       vterm_resolve_path() {
+           local target="${1:-.}"
+           print -r -- "${target:A}"
+       }
+   fi
+
    vterm_printf() {
        if [ -n "$TMUX" ] \
               && { [ "${TERM%%-*}" = "tmux" ] \
@@ -31,6 +57,6 @@ if [[ "$INSIDE_EMACS" = 'vterm' ]]; then
    }
 
    find_file() {
-       vterm_cmd find-file "$(realpath "${@:-.}")"
+       vterm_cmd find-file "$(vterm_resolve_path "${@:-.}")"
    }
 fi
