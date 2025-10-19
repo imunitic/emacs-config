@@ -307,6 +307,13 @@ With C-u ARG, split horizontally (below)."
   (other-window 1)
   (vterm))
 
+(defun my/reload-config ()
+  "Reload the main Emacs configuration."
+  (interactive)
+  (let ((start (current-time)))
+    (load-file (expand-file-name "init.el" user-emacs-directory))
+    (message "Config reloaded in %.2fs" (float-time (time-subtract (current-time) start)))))
+
 (use-package general
   :after evil
   :config
@@ -366,6 +373,10 @@ With C-u ARG, split horizontally (below)."
     "sp"  '(project-find-file     :which-key "project file")
     "sd"  '(xref-find-definitions :which-key "go to def")
     "sr"  '(xref-find-references  :which-key "references"))
+
+  (my/leader
+    "h"   '(:ignore t :which-key "help")
+    "hr"  '(my/reload-config :which-key "reload config"))
 
   (my/leader
     "o"   '(:ignore t :which-key "open")
