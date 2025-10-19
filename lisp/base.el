@@ -8,7 +8,7 @@
   :if (memq window-system '(mac ns x))
   :init
   (setq exec-path-from-shell-variables
-	'("PATH" "MANPATH" "TMPDIR"))
+        '("PATH" "MANPATH" "TMPDIR" "OPENAI_API_KEY"))
   :config
   (exec-path-from-shell-initialize))
 
@@ -369,6 +369,11 @@ With C-u ARG, split horizontally (below)."
 
   (my/leader
     "o"   '(:ignore t :which-key "open")
+    "oc"  '(codex-cli-toggle :which-key "codex toggle")
+    "oC"  '(codex-cli-toggle-all :which-key "codex sessions")
+    "op"  '(codex-cli-send-prompt :which-key "codex prompt")
+    "or"  '(codex-cli-send-region :which-key "codex send region")
+    "of"  '(codex-cli-send-file :which-key "codex send file")
     "ot"  '(my/vterm-split :which-key "open vterm in split"))
 
   ;; ========== COMMENT (SPC c) ==========
