@@ -432,8 +432,9 @@ With C-u ARG, split horizontally (below)."
         display-line-numbers-width 4
         display-line-numbers-type 'relative)
 
-  (setq insert-directory-program "gls")
-  (setq dired-use-ls-dired t)
+  (when (executable-find "gls")
+    (setq insert-directory-program "gls"
+          dired-use-ls-dired t))
 
   ;; Start Emacs fullscreen (choose one)
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
