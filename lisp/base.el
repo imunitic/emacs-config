@@ -77,6 +77,7 @@
   (setq eglot-extend-to-xref t))
 
 (use-package vterm
+  :if (memq system-type '(gnu gnu/linux darwin))
   :config
   (add-hook 'vterm-mode-hook (lambda () (display-line-numbers-mode 0))))
 
@@ -100,6 +101,7 @@
 
 (use-package eshell-vterm
   :after eshell
+  :if (memq system-type '(gnu gnu/linux darwin))
   :config
   (eshell-vterm-mode))
 
@@ -178,7 +180,7 @@
 
 (use-package ob-mermaid
   :config
-  (setq ob-mermaid-cli-path "/opt/homebrew/bin/mmdc"))
+  (setq ob-mermaid-cli-path (or (executable-find "mmdc") "mmdc")))
 
 ;; (use-package iedit
 ;;   :bind (("C-;" . iedit-mode)))
@@ -297,15 +299,19 @@
   )
 
 (defun my/vterm-split (&optional arg)
-  "Open vterm in a split.
-With no ARG, split vertically (right).
-With C-u ARG, split horizontally (below)."
+  "Open a terminal in a split.
+Prefer vterm when available; fall back to ansi-term otherwise.
+With no ARG, split vertically (right).  With C-u ARG, split horizontally (below)."
   (interactive "P")
   (if arg
       (split-window-below)
     (split-window-right))
   (other-window 1)
-  (vterm))
+  (cond
+   ((fboundp 'vterm) (vterm))
+   ((fboundp 'ansi-term)
+    (ansi-term (or explicit-shell-file-name shell-file-name)))
+   (t (shell))))
 
 (defun my/reload-config ()
   "Reload the main Emacs configuration."
