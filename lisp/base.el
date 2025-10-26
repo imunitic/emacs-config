@@ -1,8 +1,6 @@
 (use-package ample-theme
-  :init (progn (load-theme 'ample t t)
-               (load-theme 'ample-flat t t)
-               (load-theme 'ample-light t t)
-               (enable-theme 'ample-flat)))
+  :init
+  (load-theme 'ample-flat t))
 
 (use-package exec-path-from-shell
   :if (memq window-system '(mac ns x))
