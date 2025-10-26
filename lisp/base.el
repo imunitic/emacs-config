@@ -450,6 +450,7 @@ With no ARG, split vertically (right).  With C-u ARG, split horizontally (below)
         display-line-numbers-type 'relative)
 
   (when (executable-find "gls")
+    (setq dired-listing-switches "-alh --group-directories-first")
     (setq insert-directory-program "gls"
           dired-use-ls-dired t))
 
