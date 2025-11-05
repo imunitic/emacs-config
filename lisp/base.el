@@ -180,15 +180,6 @@
   :config
   (setq ob-mermaid-cli-path (or (executable-find "mmdc") "mmdc")))
 
-;; (use-package iedit
-;;   :bind (("C-;" . iedit-mode)))
-
-;; (use-package multiple-cursors
-;;   :bind (("C->" . mc/mark-next-like-this)
-;;          ("C-<" . mc/mark-previous-like-this)
-;;          ("C-c C-<" . mc/mark-all-like-this)))
-
-
 ;;; --- Evil core ------------------------------------------------------------
 (use-package evil
   :init
@@ -210,48 +201,48 @@
   :config
   (evil-collection-init))
 
-;;; --- Multiple cursors (Evil-native) ---------------------------------------
-;; Evil-MC essentials under SPC m (mode/local leader) and some globals
-(use-package evil-mc
-  :after evil
-  :hook (prog-mode . evil-mc-mode)
-  :config
-  ;; your earlier picks (kept)
-  (define-key evil-normal-state-map (kbd "g m") #'evil-mc-make-all-cursors)
-  (define-key evil-normal-state-map (kbd "g M") #'evil-mc-undo-all-cursors)
-  (define-key evil-visual-state-map (kbd "g m") #'evil-mc-make-cursor-in-visual-selection-end)
-  (define-key evil-normal-state-map (kbd "C-n") #'evil-mc-make-and-goto-next-match)
-  (define-key evil-normal-state-map (kbd "C-p") #'evil-mc-make-and-goto-prev-match)
-
-  ;; add skip on g s / g S (so you keep xref C-t intact)
-  (define-key evil-normal-state-map (kbd "g s") #'evil-mc-skip-and-goto-next-match)
-  (define-key evil-normal-state-map (kbd "g S") #'evil-mc-skip-and-goto-prev-match)
-
-  ;; local-leader shortcuts for MC workflows
-  (my/local-leader
-    "m"  '(:ignore t :which-key "multi-cursor")
-    "mm" '(evil-mc-make-all-cursors :which-key "make all")
-    "ms" '(evil-mc-skip-and-goto-next-match :which-key "skip →")
-    "mS" '(evil-mc-skip-and-goto-prev-match :which-key "skip ←")
-    "mq" '(evil-mc-undo-all-cursors :which-key "clear")))
-
 (use-package evil-commentary
   :after evil
   :config
   (evil-commentary-mode))
 
 ;;; --- Iedit + Evil-friendly entry ------------------------------------------
+;;; --- Multiple cursors (Simplified: Iedit + Evil integration) -------------
 (use-package iedit
+  :after evil
   :bind (("C-;" . iedit-mode))
-  :commands (iedit-mode iedit-restrict-function iedit-rectangle-mode))
+  :commands (iedit-mode iedit-restrict-function iedit-rectangle-mode)
+  :config
+  ;; Unbind Evil’s paste-pop keys globally — we don’t use them (you use M-y)
+  (with-eval-after-load 'evil-maps
+    (define-key evil-normal-state-map (kbd "C-n") nil)
+    (define-key evil-visual-state-map (kbd "C-n") nil)
+    (define-key evil-normal-state-map (kbd "C-p") nil)
+    (define-key evil-visual-state-map (kbd "C-p") nil))
+
+  ;; Navigation and control inside iedit-mode
+  (with-eval-after-load 'iedit
+    (define-key iedit-mode-keymap (kbd "C-n") #'iedit-next-occurrence)
+    (define-key iedit-mode-keymap (kbd "C-p") #'iedit-prev-occurrence)
+    (define-key iedit-mode-keymap (kbd "<tab>") #'iedit-toggle-selection)
+    (define-key iedit-mode-keymap (kbd "<escape>") #'iedit-mode)))
 
 (use-package evil-iedit-state
   :after (evil iedit)
   :commands (evil-iedit-state/iedit-mode)
   :init
   (with-eval-after-load 'evil
+    ;; Start iedit from normal or visual mode with `gr`
     (evil-define-key 'normal 'global (kbd "g r") #'evil-iedit-state/iedit-mode)
-    (evil-define-key 'visual 'global (kbd "g r") #'evil-iedit-state/iedit-mode)))
+    (evil-define-key 'visual 'global (kbd "g r") #'evil-iedit-state/iedit-mode))
+  :config
+  ;; Ensure same navigation keys work in evil-iedit-state
+  (with-eval-after-load 'iedit
+    (evil-define-key 'iedit iedit-mode-keymap
+      (kbd "C-n") #'iedit-next-occurrence
+      (kbd "C-p") #'iedit-prev-occurrence
+      (kbd "<tab>") #'iedit-toggle-selection
+      (kbd "<escape>") #'evil-iedit-state/quit-iedit-mode)))
 
 (use-package helpful
   :bind (("C-h f" . helpful-callable)

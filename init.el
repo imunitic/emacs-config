@@ -255,3 +255,4 @@ If the new path's directories does not exist, create them."
             (require feature)
           (error
            (message "Error requiring %s: %s" feature (error-message-string err))))))))
+(put 'narrow-to-region 'disabled nil)
