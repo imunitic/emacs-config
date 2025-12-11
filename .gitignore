@@ -22,6 +22,9 @@ straight/build-cache.el
 history
 .mc-lists.el
 
+# Org data
+org-roam.db
+
 # Auto-generated files
 custom.el
 
