@@ -1,7 +1,7 @@
 ;;; lang-ocaml.el --- OCaml support with opam, dune, merlin, and ocaml-lsp -*- lexical-binding: t; -*-
 
-(when (featurep 'exec-path-from-shell)
-  ;; Extend just for OCaml-specific vars
+(with-eval-after-load 'exec-path-from-shell
+  ;; Extend just for OCaml-specific vars once PATH sync completes
   (exec-path-from-shell-copy-envs
    '("OPAM_SWITCH_PREFIX" "OCAML_TOPLEVEL_PATH" "CAML_LD_LIBRARY_PATH")))
 

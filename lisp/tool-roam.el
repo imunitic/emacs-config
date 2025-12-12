@@ -21,9 +21,16 @@ Override via the ORG_ROAM_DIR environment variable.")
 
 (use-package org-roam
   :straight t
-  :custom
-  (org-roam-directory tool-roam--notes-dir)
-  (org-roam-db-location tool-roam--db-path)
+  :defer t
+  :commands (org-roam-buffer-toggle
+             org-roam-node-find
+             org-roam-node-insert
+             org-roam-graph
+             org-roam-capture
+             org-roam-dailies-capture-today)
+  :init
+  (setq org-roam-directory tool-roam--notes-dir
+        org-roam-db-location tool-roam--db-path)
   :bind (("C-c n l" . org-roam-buffer-toggle)
          ("C-c n f" . org-roam-node-find)
          ("C-c n g" . org-roam-graph)
