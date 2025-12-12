@@ -6,9 +6,8 @@
   :if (memq window-system '(mac ns x))
   :init
   (setq exec-path-from-shell-variables
-        '("PATH" "MANPATH" "TMPDIR" "OPENAI_API_KEY"))
-  :config
-  (exec-path-from-shell-initialize))
+        '("PATH" "MANPATH" "TMPDIR" "OPENAI_API_KEY" "JAVA_HOME"))
+  :hook (after-init . exec-path-from-shell-initialize))
 
 (use-package all-the-icons
   :if (display-graphic-p)
@@ -74,25 +73,36 @@
   ;; Silence noisy messages, optional
   (setq eglot-extend-to-xref t))
 
+(defun my/vterm-disable-line-numbers ()
+  (display-line-numbers-mode 0))
+
 (use-package vterm
   :if (memq system-type '(gnu gnu/linux darwin))
-  :config
-  (add-hook 'vterm-mode-hook (lambda () (display-line-numbers-mode 0))))
+  :commands (vterm vterm-other-window)
+  :hook (vterm-mode . my/vterm-disable-line-numbers))
+
+(defun my/powerline-setup ()
+  (require 'powerline)
+  (powerline-default-theme))
 
 ;; Powerline
 (use-package powerline
-  :config
-  (powerline-default-theme))
+  :defer t
+  :hook (after-init . my/powerline-setup))
 
 ;; Buffers
 (setq switch-to-buffer-obey-display-actions t)
 
 ;; eshell
+(defun my/eshell-mode-setup ()
+  (display-line-numbers-mode 0))
+
 (use-package eshell
+  :commands (eshell eshell-command)
+  :hook (eshell-mode . my/eshell-mode-setup)
   :config
   (setq eshell-destroy-buffer-when-process-dies t)
   (with-eval-after-load 'em-term
-    (add-hook 'eshell-mode-hook (lambda () (display-line-numbers-mode 0)))
     (add-to-list 'eshell-visual-commands "lazygit")
     (add-to-list 'eshell-visual-commands "lf")
     (add-to-list 'eshell-visual-commands "nvim")))
@@ -100,15 +110,20 @@
 (use-package eshell-vterm
   :after eshell
   :if (memq system-type '(gnu gnu/linux darwin))
-  :config
-  (eshell-vterm-mode))
+  :commands (eshell-vterm-mode)
+  :hook (eshell-mode . eshell-vterm-mode))
 
 (use-package eshell-z
-  :hook (eshell-mode . (lambda () (require 'eshell-z))))
+  :commands (eshell-z)
+  :hook (eshell-mode . eshell-z))
+
+(defun my/eshell-git-prompt-setup ()
+  (eshell-git-prompt-use-theme 'robbyrussell))
 
 (use-package eshell-git-prompt
-  :config
-  (eshell-git-prompt-use-theme 'robbyrussell))
+  :after eshell
+  :commands (eshell-git-prompt-use-theme)
+  :hook (eshell-first-time-mode . my/eshell-git-prompt-setup))
 
 ;; vertico
 (use-package vertico
@@ -169,7 +184,8 @@
 
 ;; elfeed
 (use-package elfeed
-  :config
+  :commands (elfeed)
+  :init
   (setq elfeed-feeds
 	'(("https://www.reddit.com/user/imunitic/m/tech/.rss" tech)
 	  ("https://www.reddit.com/user/imunitic/m/games/.rss" games)))
