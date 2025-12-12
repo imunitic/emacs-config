@@ -1,12 +1,29 @@
 ;;; tool-roam.el --- Org Roam -*- lexical-binding: t; -*-
 
+(defconst tool-roam--notes-dir
+  (let* ((env-dir (getenv "ORG_ROAM_DIR"))
+         (legacy "~/Development/documents/org/roam")
+         (fallback (expand-file-name "org-roam" (or (getenv "ORG_HOME") "~")))
+         (path (cond
+                (env-dir env-dir)
+                ((file-directory-p (expand-file-name legacy)) legacy)
+                (t fallback))))
+    (expand-file-name path))
+  "Absolute path to the Org-roam notes directory.
+Override via the ORG_ROAM_DIR environment variable.")
+
+(defconst tool-roam--db-path
+  (expand-file-name "org-roam.db" tool-roam--notes-dir)
+  "Absolute path to the Org-roam SQLite database.")
+
+(unless (file-directory-p tool-roam--notes-dir)
+  (make-directory tool-roam--notes-dir t))
+
 (use-package org-roam
   :straight t
   :custom
-  (org-roam-directory (file-truename "~/Development/documents/org/roam"))
-  (org-roam-db-location
-   (expand-file-name "org-roam.db"
-                     (file-truename "~/Development/documents/org/roam")))
+  (org-roam-directory tool-roam--notes-dir)
+  (org-roam-db-location tool-roam--db-path)
   :bind (("C-c n l" . org-roam-buffer-toggle)
          ("C-c n f" . org-roam-node-find)
          ("C-c n g" . org-roam-graph)
