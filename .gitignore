@@ -21,9 +21,19 @@ straight/build-cache.el
 # History / local state
 history
 .mc-lists.el
+auto-save-list/
+recentf
+places
+abbrev_defs
 
 # Org data
 org-roam.db
+.org-id-locations
+org-persist/
+
+# Emacs data files
+bookmarks
+network-security.data
 
 # Auto-generated files
 custom.el
