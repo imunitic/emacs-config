@@ -6,7 +6,8 @@
   :if (memq window-system '(mac ns x))
   :init
   (setq exec-path-from-shell-variables
-        '("PATH" "MANPATH" "TMPDIR" "OPENAI_API_KEY" "JAVA_HOME"))
+        '("PATH" "MANPATH" "TMPDIR" "OPENAI_API_KEY" "JAVA_HOME"
+          "ORG_ROAM_DIR" "LANGTOOL_JAR"))
   :hook (after-init . exec-path-from-shell-initialize))
 
 (use-package all-the-icons
