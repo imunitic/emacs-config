@@ -1,5 +1,24 @@
 ;;; tool-codex.el --- Codex CLI integration helpers -*- lexical-binding: t; -*-
 
+(declare-function org-back-to-heading "org")
+(declare-function org-end-of-subtree "org")
+
+(defun tool-codex-send-org-subtree ()
+  "Send current Org subtree to Codex as task context."
+  (interactive)
+  (unless (derived-mode-p 'org-mode)
+    (user-error "Not in an Org buffer"))
+  (let (start end)
+    (save-excursion
+      (org-back-to-heading t)
+      (setq start (point))
+      (org-end-of-subtree t t)
+      (setq end (point)))
+    (goto-char start)
+    (push-mark end t t)
+    (activate-mark)
+    (call-interactively #'codex-cli-send-region)))
+
 (use-package codex-cli
   :straight (codex-cli :type git :host github :repo "emacsmirror/codex-cli")
   :commands (codex-cli-toggle
@@ -18,6 +37,7 @@
          ("C-c c Q" . codex-cli-stop-all)
          ("C-c c p" . codex-cli-send-prompt)
          ("C-c c r" . codex-cli-send-region)
+         ("C-c c o" . tool-codex-send-org-subtree)
          ("C-c c f" . codex-cli-send-file)
          ("C-c c a" . codex-cli-toggle-all)
          ("C-c c n" . codex-cli-toggle-all-next-page)
