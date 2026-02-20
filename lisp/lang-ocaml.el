@@ -1,9 +1,9 @@
 ;;; lang-ocaml.el --- OCaml support with opam, dune, merlin, and ocaml-lsp -*- lexical-binding: t; -*-
 
 (with-eval-after-load 'exec-path-from-shell
-  ;; Extend just for OCaml-specific vars once PATH sync completes
-  (exec-path-from-shell-copy-envs
-   '("OPAM_SWITCH_PREFIX" "OCAML_TOPLEVEL_PATH" "CAML_LD_LIBRARY_PATH")))
+  ;; Add OCaml vars before exec-path-from-shell-initialize fires on after-init-hook
+  (dolist (var '("OPAM_SWITCH_PREFIX" "OCAML_TOPLEVEL_PATH" "CAML_LD_LIBRARY_PATH"))
+    (add-to-list 'exec-path-from-shell-variables var)))
 
 ;; Prefer ocaml-ts-mode if available (Emacs 29+)
 (when (fboundp 'ocaml-ts-mode)
