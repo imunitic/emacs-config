@@ -131,6 +131,21 @@
   :init
   (vertico-mode))
 
+;; floating minibuffer UI for vertico (GUI only)
+(use-package vertico-posframe
+  :after vertico
+  :if (display-graphic-p)
+  :custom
+  (vertico-posframe-width 120)
+  (vertico-posframe-min-width 80)
+  (vertico-posframe-height 20)
+  (vertico-posframe-min-height 8)
+  (vertico-posframe-border-width 1)
+  (vertico-posframe-parameters '((left-fringe . 8)
+                                 (right-fringe . 8)))
+  :config
+  (vertico-posframe-mode 1))
+
 ;; corfu
 (use-package corfu
   ;; Optional customizations
