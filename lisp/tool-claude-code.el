@@ -1,7 +1,7 @@
 ;;; tool-claude-code.el --- Claude Code CLI integration  -*- lexical-binding: t -*-
 ;;; Commentary:
 ;; Integrates Claude Code CLI into Emacs via claude-code.el.
-;; Uses C-c a prefix to avoid clashing with C-c c (codex-cli).
+;; Uses C-c a prefix.
 ;;; Code:
 
 (declare-function org-back-to-heading "org")

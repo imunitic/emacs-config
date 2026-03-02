@@ -407,12 +407,6 @@ With no ARG, split vertically (right).  With C-u ARG, split horizontally (below)
 
   (my/leader
     "o"   '(:ignore t :which-key "open")
-    "oc"  '(codex-cli-toggle :which-key "codex toggle")
-    "oC"  '(codex-cli-toggle-all :which-key "codex sessions")
-    "op"  '(codex-cli-send-prompt :which-key "codex prompt")
-    "or"  '(codex-cli-send-region :which-key "codex send region")
-    "oo"  '(tool-codex-send-org-subtree :which-key "codex send org task")
-    "of"  '(codex-cli-send-file :which-key "codex send file")
     "ot"  '(my/vterm-split :which-key "open vterm in split"))
 
   ;; ========== COMMENT (SPC c) ==========
