@@ -10,14 +10,22 @@
                '((text-mode markdown-mode org-mode git-commit-mode)
                  . ("harper-ls" "--stdio"))))
 
-(defun tool-harper--maybe-enable ()
-  "Start harper-ls via eglot if the binary is available."
-  (when (executable-find "harper-ls")
-    (eglot-ensure)))
+(defun my/harper-start ()
+  "Start harper-ls in the current buffer via eglot."
+  (interactive)
+  (if (executable-find "harper-ls")
+      (eglot-ensure)
+    (message "harper-ls not found in PATH")))
 
-(add-hook 'text-mode-hook     #'tool-harper--maybe-enable)
-(add-hook 'markdown-mode-hook #'tool-harper--maybe-enable)
-(add-hook 'org-mode-hook      #'tool-harper--maybe-enable)
+(defun my/harper-stop ()
+  "Stop harper-ls in the current buffer."
+  (interactive)
+  (if (eglot-current-server)
+      (eglot-shutdown (eglot-current-server))
+    (message "No active eglot server in this buffer")))
+
+(global-set-key (kbd "C-c 4 c") #'my/harper-start)
+(global-set-key (kbd "C-c 4 d") #'my/harper-stop)
 
 (provide 'tool-harper)
 ;;; tool-harper.el ends here
