@@ -18,6 +18,7 @@ Override via the LANGTOOL_JAR environment variable.")
         langtool-default-language "en-US")
   :bind (("C-c 4 c" . langtool-check)
          ("C-c 4 C" . langtool-correct-buffer)
+         ("C-c 4 o" . langtool-correct-at-point)
          ("C-c 4 d" . langtool-check-done)))
 
 (provide 'tool-langtool)
