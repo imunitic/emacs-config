@@ -40,3 +40,6 @@ custom.el
 
 # Projects
 projects
+
+# macOS
+.DS_Store
