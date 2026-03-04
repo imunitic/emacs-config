@@ -1,3 +1,4 @@
+;;; base.el --- description -*- lexical-binding: t; -*-
 (use-package ample-theme
   :init
   (load-theme 'ample-flat t))

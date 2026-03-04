@@ -1,3 +1,4 @@
+;;; lang-ada.el --- description -*- lexical-binding: t; -*-
 ;; Silence compile-time "unknown function" by declaring them
 (eval-when-compile
   (declare-function wisi-in-comment-p "wisi")
