@@ -1,3 +1,4 @@
+;;; tool-langtool.el --- description -*- lexical-binding: t; -*-
 (defun tool-langtool--find-jar ()
   "Return the LanguageTool JAR path, checking env var and known locations."
   (let* ((env-jar (getenv "LANGTOOL_JAR"))
