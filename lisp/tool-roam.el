@@ -1,6 +1,8 @@
 ;;; tool-roam.el --- Org Roam -*- lexical-binding: t; -*-
 
-(defconst tool-roam--notes-dir
+(defun tool-roam--resolve-notes-dir ()
+  "Return the absolute path to the Org-roam notes directory.
+Reads ORG_ROAM_DIR at call time so exec-path-from-shell has already run."
   (let* ((env-dir (getenv "ORG_ROAM_DIR"))
          (legacy "~/Development/documents/org/roam")
          (fallback (expand-file-name "org-roam" (or (getenv "ORG_HOME") "~")))
@@ -8,16 +10,7 @@
                 (env-dir env-dir)
                 ((file-directory-p (expand-file-name legacy)) legacy)
                 (t fallback))))
-    (expand-file-name path))
-  "Absolute path to the Org-roam notes directory.
-Override via the ORG_ROAM_DIR environment variable.")
-
-(defconst tool-roam--db-path
-  (expand-file-name "org-roam.db" tool-roam--notes-dir)
-  "Absolute path to the Org-roam SQLite database.")
-
-(unless (file-directory-p tool-roam--notes-dir)
-  (make-directory tool-roam--notes-dir t))
+    (expand-file-name path)))
 
 (use-package org-roam
   :straight t
@@ -29,8 +22,14 @@ Override via the ORG_ROAM_DIR environment variable.")
              org-roam-capture
              org-roam-dailies-capture-today)
   :init
-  (setq org-roam-directory tool-roam--notes-dir
-        org-roam-db-location tool-roam--db-path)
+  (add-hook 'after-init-hook
+            (lambda ()
+              (let ((dir (tool-roam--resolve-notes-dir)))
+                (unless (file-directory-p dir)
+                  (make-directory dir t))
+                (setq org-roam-directory dir
+                      org-roam-db-location (expand-file-name "org-roam.db" dir))))
+            t)  ; append — run after exec-path-from-shell-initialize
   :bind (("C-c n l" . org-roam-buffer-toggle)
          ("C-c n f" . org-roam-node-find)
          ("C-c n g" . org-roam-graph)
