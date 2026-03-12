@@ -282,6 +282,11 @@
          ("C-h v" . helpful-variable)
          ("C-h k" . helpful-key)))
 
+(use-package avy
+  :commands (avy-goto-char avy-goto-char-2)
+  :bind (("C-c j c" . avy-goto-char)
+         ("C-c j C" . avy-goto-char-2)))
+
 ;; dumb-jump as the xref backend (straight.el + use-package)
 (use-package dumb-jump
   :init
