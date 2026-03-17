@@ -23,6 +23,29 @@
           ("BLOCKED"     . (:foreground "#CC6666" :weight bold))
           ("REVIEW"      . (:foreground "#B294BB" :weight bold))
           ("DONE"        . (:foreground "#8ABA6A" :weight bold))
-          ("CANCELLED"   . (:foreground "#666666" :weight bold :strike-through t)))))
+          ("CANCELLED"   . (:foreground "#666666" :weight bold :strike-through t))))
+
+  ;; Keybinding for copying TODO items with file path
+  (define-key org-mode-map (kbd "C-c o c") #'tool-org-copy-todo-with-path))
+
+(defun tool-org-copy-todo-with-path ()
+  "Copy current Org TODO item to clipboard with full file path."
+  (interactive)
+  (unless (derived-mode-p 'org-mode)
+    (user-error "Not in an Org buffer"))
+  (unless buffer-file-name
+    (user-error "Buffer is not visiting a file"))
+  (let (start end)
+    (save-excursion
+      (org-back-to-heading t)
+      (setq start (point))
+      (org-end-of-subtree t t)
+      (setq end (point)))
+    (let ((todo-text (buffer-substring-no-properties start end))
+          (file-path buffer-file-name))
+      (with-temp-buffer
+        (insert (format "# %s\n%s" file-path todo-text))
+        (clipboard-kill-region (point-min) (point-max)))
+      (message "Copied TODO item with file path to clipboard"))))
 
 (provide 'tool-org)
