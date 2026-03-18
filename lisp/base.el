@@ -13,6 +13,7 @@
 
 (use-package all-the-icons
   :if (display-graphic-p)
+  :defer t
   :config
   (setq all-the-icons-dired-monochrome nil))
 
@@ -87,10 +88,11 @@
   (require 'powerline)
   (powerline-default-theme))
 
-;; Powerline
+;; Powerline — load lazily after first idle moment
 (use-package powerline
   :defer t
-  :hook (after-init . my/powerline-setup))
+  :init
+  (run-with-idle-timer 1 nil #'my/powerline-setup))
 
 ;; Buffers
 (setq switch-to-buffer-obey-display-actions t)
@@ -210,6 +212,8 @@
   ("C-c w" . elfeed))
 
 (use-package ob-mermaid
+  :defer t
+  :commands (ob-mermaid-execute)
   :config
   (setq ob-mermaid-cli-path (or (executable-find "mmdc") "mmdc")))
 
