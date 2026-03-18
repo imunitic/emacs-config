@@ -213,11 +213,13 @@ If the new path's directories does not exist, create them."
 ;; Add the time to the tab-bar, if visible
 (add-to-list 'tab-bar-format 'tab-bar-format-align-right 'append)
 (add-to-list 'tab-bar-format 'tab-bar-format-global 'append)
-(setopt display-time-format "%a %F %T")
-(setopt display-time-interval 1)
+(setopt display-time-format "%a %F %H:%M")
+(setopt display-time-interval 60)
 (display-time-mode)
 
-(setq gc-cons-threshold (or bedrock--initial-gc-threshold 800000))
+;; After startup, keep GC threshold at 16 MB instead of the Emacs default
+;; 800 KB — reduces GC frequency during normal use.
+(setq gc-cons-threshold (* 16 1024 1024))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
