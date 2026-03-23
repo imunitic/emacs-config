@@ -8,7 +8,8 @@
 (declare-function org-end-of-subtree "org")
 
 (defun tool-claude-code-send-org-subtree ()
-  "Send current Org subtree to Claude Code as task context."
+  "Send current Org subtree to Claude Code as task context.
+Prepends the file path as a comment when the buffer visits a file."
   (interactive)
   (unless (derived-mode-p 'org-mode)
     (user-error "Not in an Org buffer"))
@@ -18,10 +19,15 @@
       (setq start (point))
       (org-end-of-subtree t t)
       (setq end (point)))
-    (goto-char start)
-    (push-mark end t t)
-    (activate-mark)
-    (call-interactively #'claude-code-send-region)))
+    (let ((subtree (buffer-substring-no-properties start end))
+          (file-path buffer-file-name))
+      (with-temp-buffer
+        (when file-path
+          (insert (format "# %s\n" file-path)))
+        (insert subtree)
+        (push-mark (point-min) t t)
+        (goto-char (point-max))
+        (call-interactively #'claude-code-send-region)))))
 
 (use-package inheritenv
   :straight (:type git :host github :repo "purcell/inheritenv"))
