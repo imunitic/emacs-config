@@ -6,11 +6,10 @@
 (use-package dired-subtree
   :straight t
   :after dired
-  :bind (:map dired-mode-map
-              ("TAB" . dired-subtree-toggle)
-              ("<backtab>" . dired-subtree-cycle))
+  :hook (dired-mode . (lambda ()
+     (define-key dired-mode-map (kbd "TAB") #'dired-subtree-toggle)
+     (define-key dired-mode-map (kbd "<backtab>") #'dired-subtree-cycle)))
   :config
   (setq dired-subtree-use-backgrounds nil))
-
 (provide 'tool-dired)
 ;;; tool-dired.el ends here
