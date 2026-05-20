@@ -4,7 +4,7 @@
   (load-theme 'ample-flat t))
 
 (use-package exec-path-from-shell
-  :if (memq window-system '(mac ns x))
+  :if (or (daemonp) (memq window-system '(mac ns x)))
   :init
   (setq exec-path-from-shell-variables
         '("PATH" "MANPATH" "TMPDIR" "OPENAI_API_KEY" "JAVA_HOME"
@@ -12,7 +12,7 @@
   :hook (after-init . exec-path-from-shell-initialize))
 
 (use-package all-the-icons
-  :if (display-graphic-p)
+  :if (or (daemonp) (display-graphic-p))
   :defer t
   :config
   (setq all-the-icons-dired-monochrome nil))
@@ -137,7 +137,7 @@
 ;; floating minibuffer UI for vertico (GUI only)
 (use-package vertico-posframe
   :after vertico
-  :if (display-graphic-p)
+  :if (or (daemonp) (display-graphic-p))
   :custom
   (vertico-posframe-width 120)
   (vertico-posframe-min-width 80)
