@@ -502,7 +502,14 @@ With no ARG, split vertically (right).  With C-u ARG, split horizontally (below)
   (add-hook 'after-make-frame-functions #'my/set-preferred-font)
 
   ;; Dired: allow visiting in same buffer with `a`
-  (put 'dired-find-alternate-file 'disabled nil))
+  (put 'dired-find-alternate-file 'disabled nil)
+
+  ;; Clicking the Dock icon (or Spotlight "Emacs") when no frames are visible
+  ;; creates a new frame instead of doing nothing.
+  (add-hook 'ns-reopen-application-hook
+            (lambda ()
+              (unless (seq-find #'frame-visible-p (frame-list))
+                (select-frame (make-frame))))))
 
 
 (provide 'base)
