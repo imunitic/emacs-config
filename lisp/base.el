@@ -495,9 +495,10 @@ With no ARG, split vertically (right).  With C-u ARG, split horizontally (below)
   (global-auto-revert-mode 1)
 
   ;; Font (guarded for daemon/availability)
-  (defun my/set-preferred-font (&rest _)
-    (when (member "Hurmit Nerd Font Mono" (font-family-list))
-      (set-frame-font "Hurmit Nerd Font Mono 16" nil t)))
+  (defun my/set-preferred-font (&optional frame)
+    (with-selected-frame (or frame (selected-frame))
+      (when (member "Hurmit Nerd Font Mono" (font-family-list))
+        (set-frame-font "Hurmit Nerd Font Mono 16" nil t))))
   (my/set-preferred-font)
   (add-hook 'after-make-frame-functions #'my/set-preferred-font)
 
