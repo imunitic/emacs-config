@@ -29,7 +29,9 @@
 
 (with-eval-after-load 'ocaml-ts-mode
   (add-hook 'ocaml-ts-mode-hook #'eglot-ensure)
-  (add-hook 'ocaml-interface-ts-mode-hook #'eglot-ensure))
+  (add-hook 'ocaml-ts-mode-hook #'eglot-inlay-hints-mode)
+  (add-hook 'ocaml-interface-ts-mode-hook #'eglot-ensure)
+  (add-hook 'ocaml-interface-ts-mode-hook #'eglot-inlay-hints-mode))
 
 (provide 'lang-ocaml)
 ;;; lang-ocaml.el ends here
