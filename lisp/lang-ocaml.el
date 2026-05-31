@@ -1,39 +1,35 @@
-;;; lang-ocaml.el --- OCaml support with opam, dune, merlin, and ocaml-lsp -*- lexical-binding: t; -*-
+;;; lang-ocaml.el --- OCaml support  -*- lexical-binding: t; -*-
+
+(with-eval-after-load 'treesit
+  (add-to-list 'treesit-language-source-alist
+               '(ocaml "https://github.com/tree-sitter/tree-sitter-ocaml" nil "grammars/ocaml/src"))
+  (add-to-list 'treesit-language-source-alist
+               '(ocaml-interface "https://github.com/tree-sitter/tree-sitter-ocaml" nil "grammars/interface/src")))
 
 (with-eval-after-load 'exec-path-from-shell
-  ;; Add OCaml vars before exec-path-from-shell-initialize fires on after-init-hook
   (dolist (var '("OPAM_SWITCH_PREFIX" "OCAML_TOPLEVEL_PATH" "CAML_LD_LIBRARY_PATH"))
     (add-to-list 'exec-path-from-shell-variables var)))
 
-;; Prefer ocaml-ts-mode if available (Emacs 29+)
-(when (fboundp 'ocaml-ts-mode)
-  (add-to-list 'auto-mode-alist '("\\.ml\\'"  . ocaml-ts-mode))
-  (add-to-list 'auto-mode-alist '("\\.mli\\'" . ocaml-ts-mode)))
+(use-package ocaml-ts-mode
+  :straight t
+  :mode (("\\.ml\\'"  . ocaml-ts-mode)
+         ("\\.mli\\'" . ocaml-interface-ts-mode)))
 
-;; ocamlformat
-(use-package ocamlformat)
+(use-package ocamlformat
+  :straight t
+  :hook (ocaml-ts-mode . (lambda ()
+                           (add-hook 'before-save-hook #'ocamlformat-before-save nil t))))
 
-;; tuareg for older OCaml files
-(use-package tuareg)  ;; (no merlin hook)
+(use-package dune
+  :straight t)
 
-;; merlin installed but not auto-enabled (ocamllsp provides LSP features)
-(use-package merlin
-  :config
-  (setq merlin-command "ocamlmerlin"))
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs
+               '((ocaml-ts-mode ocaml-interface-ts-mode) . ("ocamllsp"))))
 
-;; ocaml-lsp with eglot (auto-start)
-(defvar eglot-server-programs nil)  ;; avoid "void variable" on add-to-list
-(use-package eglot
-  :hook ((ocaml-ts-mode . eglot-ensure)
-         (tuareg-mode   . eglot-ensure)
-         (reason-mode   . eglot-ensure))
-  :config
-  (add-to-list 'eglot-server-programs '(tuareg-mode   . ("ocamllsp")))
-  (add-to-list 'eglot-server-programs '(ocaml-ts-mode . ("ocamllsp")))
-  (add-to-list 'eglot-server-programs '(reason-mode   . ("ocamllsp"))))
-
-;; dune integration
-(use-package dune)
+(with-eval-after-load 'ocaml-ts-mode
+  (add-hook 'ocaml-ts-mode-hook #'eglot-ensure)
+  (add-hook 'ocaml-interface-ts-mode-hook #'eglot-ensure))
 
 (provide 'lang-ocaml)
 ;;; lang-ocaml.el ends here
