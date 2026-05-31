@@ -29,9 +29,16 @@
 
 (with-eval-after-load 'ocaml-ts-mode
   (add-hook 'ocaml-ts-mode-hook #'eglot-ensure)
-  (add-hook 'ocaml-ts-mode-hook #'eglot-inlay-hints-mode)
   (add-hook 'ocaml-interface-ts-mode-hook #'eglot-ensure)
-  (add-hook 'ocaml-interface-ts-mode-hook #'eglot-inlay-hints-mode))
+  ;; append so eglot-ensure fires first and loads eglot before this runs
+  (add-hook 'ocaml-ts-mode-hook
+            (lambda () (when (fboundp 'eglot-inlay-hints-mode)
+                         (eglot-inlay-hints-mode 1)))
+            t)
+  (add-hook 'ocaml-interface-ts-mode-hook
+            (lambda () (when (fboundp 'eglot-inlay-hints-mode)
+                         (eglot-inlay-hints-mode 1)))
+            t))
 
 (provide 'lang-ocaml)
 ;;; lang-ocaml.el ends here
