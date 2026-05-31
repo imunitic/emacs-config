@@ -13,7 +13,7 @@
 (use-package ocaml-ts-mode
   :straight t
   :mode (("\\.ml\\'"  . ocaml-ts-mode)
-         ("\\.mli\\'" . ocaml-interface-ts-mode)))
+         ("\\.mli\\'" . ocamli-ts-mode)))
 
 (use-package ocamlformat
   :straight t
@@ -25,20 +25,16 @@
 
 (with-eval-after-load 'eglot
   (add-to-list 'eglot-server-programs
-               '((ocaml-ts-mode ocaml-interface-ts-mode) . ("ocamllsp"))))
+               '((ocaml-ts-mode ocamli-ts-mode) . ("ocamllsp"))))
 
 (with-eval-after-load 'ocaml-ts-mode
   (add-hook 'ocaml-ts-mode-hook #'eglot-ensure)
-  (add-hook 'ocaml-interface-ts-mode-hook #'eglot-ensure)
-  ;; append so eglot-ensure fires first and loads eglot before this runs
-  (add-hook 'ocaml-ts-mode-hook
-            (lambda () (when (fboundp 'eglot-inlay-hints-mode)
-                         (eglot-inlay-hints-mode 1)))
-            t)
-  (add-hook 'ocaml-interface-ts-mode-hook
-            (lambda () (when (fboundp 'eglot-inlay-hints-mode)
-                         (eglot-inlay-hints-mode 1)))
-            t))
+  (add-hook 'ocamli-ts-mode-hook #'eglot-ensure)
+  ;; Force immediate treesit fontification so colors appear on first open
+  ;; without waiting for jit-lock's lazy cycle. eglot's font-lock-flush
+  ;; on connect would otherwise create a visible no-color window.
+  (add-hook 'ocaml-ts-mode-hook #'font-lock-ensure t)
+  (add-hook 'ocamli-ts-mode-hook #'font-lock-ensure t))
 
 (provide 'lang-ocaml)
 ;;; lang-ocaml.el ends here
