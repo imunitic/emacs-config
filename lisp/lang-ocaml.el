@@ -10,6 +10,12 @@
   (dolist (var '("OPAM_SWITCH_PREFIX" "OCAML_TOPLEVEL_PATH" "CAML_LD_LIBRARY_PATH"))
     (add-to-list 'exec-path-from-shell-variables var)))
 
+;; Apply per-directory direnv environments so eglot/ocamllsp pick up
+;; the project-local opam switch (_opam/) rather than the global one.
+(use-package envrc
+  :straight t
+  :hook (after-init . envrc-global-mode))
+
 (use-package ocaml-ts-mode
   :straight t
   :mode (("\\.ml\\'"  . ocaml-ts-mode)
