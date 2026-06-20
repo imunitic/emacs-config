@@ -82,7 +82,14 @@
 (use-package vterm
   :if (memq system-type '(gnu gnu/linux darwin))
   :commands (vterm vterm-other-window)
-  :hook (vterm-mode . my/vterm-disable-line-numbers))
+  :hook (vterm-mode . my/vterm-disable-line-numbers)
+  :init
+  ;; Do not set KITTY_WINDOW_ID here: that causes Claude Code's oX1() to
+  ;; return "kitty" → ap5()=true → Kitty keyboard protocol sent → rendering
+  ;; artifacts.  vterm's default TERM=xterm-256color and no TERM_PROGRAM
+  ;; already make oX1() return null (basic-terminal mode), which is correct.
+  ;; FORCE_COLOR=3 ensures chalk uses truecolor regardless.
+  (setq vterm-environment '("FORCE_COLOR=3")))
 
 (defun my/powerline-setup ()
   (require 'powerline)
