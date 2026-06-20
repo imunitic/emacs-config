@@ -79,10 +79,18 @@
 (defun my/vterm-disable-line-numbers ()
   (display-line-numbers-mode 0))
 
+(defun my/terminal-nobreak-space-fix ()
+  "Render U+00A0 as a plain space in terminal buffers.
+Standalone terminals display NBSP identically to regular space; Emacs
+applies the nobreak-space face (underlined by default) to NBSP in buffer
+text, making it look like _ in colored regions (e.g. ccstatusline output)."
+  (face-remap-add-relative 'nobreak-space :underline nil))
+
 (use-package vterm
   :if (memq system-type '(gnu gnu/linux darwin))
   :commands (vterm vterm-other-window)
-  :hook (vterm-mode . my/vterm-disable-line-numbers)
+  :hook ((vterm-mode . my/vterm-disable-line-numbers)
+         (vterm-mode . my/terminal-nobreak-space-fix))
   :init
   ;; Do not set KITTY_WINDOW_ID here: that causes Claude Code's oX1() to
   ;; return "kitty" → ap5()=true → Kitty keyboard protocol sent → rendering
@@ -336,20 +344,10 @@
   (idle-highlight-inhibit-commands '(keyboard-quit)) ; don’t flash after quit
   )
 
-(defun my/vterm-split (&optional arg)
-  "Open a terminal in a split.
-Prefer vterm when available; fall back to ansi-term otherwise.
-With no ARG, split vertically (right).  With C-u ARG, split horizontally (below)."
-  (interactive "P")
-  (if arg
-      (split-window-below)
-    (split-window-right))
-  (other-window 1)
-  (cond
-   ((fboundp 'vterm) (vterm))
-   ((fboundp 'ansi-term)
-    (ansi-term (or explicit-shell-file-name shell-file-name)))
-   (t (shell))))
+(defun my/vterm-new ()
+  "Open a new vterm buffer (never reuses an existing one)."
+  (interactive)
+  (vterm t))
 
 (defun my/reload-config ()
   "Reload the main Emacs configuration."
@@ -396,10 +394,19 @@ With no ARG, split vertically (right).  With C-u ARG, split horizontally (below)
     "wv"  '(split-window-right    :which-key "split right")
     "wd"  '(delete-window         :which-key "delete window")
     "wo"  '(delete-other-windows  :which-key "only this")
-    "wh"  '(windmove-left         :which-key "←")
-    "wj"  '(windmove-down         :which-key "↓")
-    "wk"  '(windmove-up           :which-key "↑")
-    "wl"  '(windmove-right        :which-key "→"))
+    "wh"  '(windmove-left              :which-key "←")
+    "wj"  '(windmove-down             :which-key "↓")
+    "wk"  '(windmove-up               :which-key "↑")
+    "wl"  '(windmove-right            :which-key "→")
+    "w]"  '(enlarge-window-horizontally  :which-key "wider")
+    "w["  '(shrink-window-horizontally   :which-key "narrower")
+    "w+"  '(enlarge-window              :which-key "taller")
+    "w-"  '(shrink-window               :which-key "shorter")
+    "w="  '(balance-windows             :which-key "balance")
+    "ww"  '(other-window               :which-key "other window")
+    "wp"  '((lambda () (interactive) (other-window -1)) :which-key "prev window")
+    "wS"  '(scroll-other-window        :which-key "scroll other ↓")
+    "wR"  '(scroll-other-window-down   :which-key "scroll other ↑"))
 
   ;; ========== GIT / MAGIT (SPC g) ==========
   (my/leader
@@ -424,7 +431,8 @@ With no ARG, split vertically (right).  With C-u ARG, split horizontally (below)
 
   (my/leader
     "o"   '(:ignore t :which-key "open")
-    "ot"  '(my/vterm-split :which-key "open vterm in split"))
+    "ot"  '(vterm        :which-key "vterm")
+    "oT"  '(my/vterm-new :which-key "new vterm"))
 
   ;; ========== COMMENT (SPC c) ==========
   ;; Works if you enabled either evil-commentary or evil-nerd-commenter.

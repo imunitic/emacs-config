@@ -9,24 +9,19 @@
 ;; run M-x ghostel-download-module or M-x ghostel-module-compile.
 ;;
 ;; Entry points:
-;;   M-x ghostel             — open a terminal buffer
+;;   SPC o g  — open ghostel (reuse existing buffer)
+;;   SPC o G  — open a new ghostel buffer
 ;;   M-x ghostel-project     — open one in the current project root
-;;   M-x my/ghostel-split    — open in a vertical/horizontal split
 ;;; Code:
 
 (defun tool-ghostel--disable-line-numbers ()
   "Turn off `display-line-numbers-mode' in ghostel buffers."
   (display-line-numbers-mode 0))
 
-(defun my/ghostel-split (&optional arg)
-  "Open a ghostel terminal in a split.
-With no ARG, split vertically (right).  With C-u ARG, split horizontally (below)."
-  (interactive "P")
-  (if arg
-      (split-window-below)
-    (split-window-right))
-  (other-window 1)
-  (ghostel))
+(defun my/ghostel-new ()
+  "Open a new ghostel buffer (never reuses an existing one)."
+  (interactive)
+  (ghostel t))
 
 (use-package ghostel
   :straight (ghostel :type git :host github :repo "dakra/ghostel"
@@ -44,14 +39,13 @@ With no ARG, split vertically (right).  With C-u ARG, split horizontally (below)
              ghostel-clear
              ghostel-download-module
              ghostel-module-compile)
-  :hook (ghostel-mode . tool-ghostel--disable-line-numbers)
+  :hook ((ghostel-mode . tool-ghostel--disable-line-numbers)
+         (ghostel-mode . my/terminal-nobreak-space-fix))
   :init
   ;; FORCE_COLOR=3 ensures chalk truecolor regardless of TTY heuristics.
-  ;; The _ artifacts in Claude Code's status line are caused by ccstatusline
-  ;; using U+00A0 (NO-BREAK SPACE) as its space character; Emacs applies the
-  ;; nobreak-space face (underlined) to NBSP, making underlined spaces look
-  ;; like underscores.  Fixed via the status line command in ~/.claude/settings.json
-  ;; piping through perl to replace NBSP with regular space.
+  ;; my/terminal-nobreak-space-fix (defined in base.el) suppresses Emacs's
+  ;; nobreak-space face in this buffer so U+00A0 renders as a plain space,
+  ;; matching how standalone terminals display it.
   (setq ghostel-environment '("FORCE_COLOR=3"))
   :config
   ;; Match vterm's palette: vterm inherits from `term-color-*' (which the
@@ -73,6 +67,13 @@ With no ARG, split vertically (right).  With C-u ARG, split horizontally (below)
                           :files ("extensions/evil-ghostel/*.el"))
   :after (ghostel evil)
   :hook (ghostel-mode . evil-ghostel-mode))
+
+(with-eval-after-load 'general
+  (general-define-key
+   :states '(normal visual)
+   :prefix "SPC"
+   "og" '(ghostel        :which-key "ghostel")
+   "oG" '(my/ghostel-new :which-key "new ghostel")))
 
 (provide 'tool-ghostel)
 ;;; tool-ghostel.el ends here
