@@ -45,6 +45,14 @@ With no ARG, split vertically (right).  With C-u ARG, split horizontally (below)
              ghostel-download-module
              ghostel-module-compile)
   :hook (ghostel-mode . tool-ghostel--disable-line-numbers)
+  :init
+  ;; FORCE_COLOR=3 ensures chalk truecolor regardless of TTY heuristics.
+  ;; The _ artifacts in Claude Code's status line are caused by ccstatusline
+  ;; using U+00A0 (NO-BREAK SPACE) as its space character; Emacs applies the
+  ;; nobreak-space face (underlined) to NBSP, making underlined spaces look
+  ;; like underscores.  Fixed via the status line command in ~/.claude/settings.json
+  ;; piping through perl to replace NBSP with regular space.
+  (setq ghostel-environment '("FORCE_COLOR=3"))
   :config
   ;; Match vterm's palette: vterm inherits from `term-color-*' (which the
   ;; ample-flat theme tints brightly), but ghostel inherits from
