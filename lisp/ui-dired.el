@@ -26,5 +26,14 @@
   (add-hook 'dired-mode-hook #'dired-hide-details-mode)
   (add-hook 'dired-mode-hook #'hl-line-mode))
 
+(add-hook 'dired-mode-hook
+  (lambda ()
+    ;; evil-collection puts dired in normal state and binds SPC to
+    ;; dired-next-line in dired-mode-map's normal-state auxiliary keymap,
+    ;; shadowing our leader prefix.  Override it buffer-locally so SPC
+    ;; triggers the leader instead.
+    (when-let ((leader (lookup-key evil-normal-state-map (kbd "SPC"))))
+      (evil-local-set-key 'normal (kbd "SPC") leader))))
+
 (provide 'ui-dired)
 ;;; ui-dired.el ends here

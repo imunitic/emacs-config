@@ -359,14 +359,17 @@ text, making it look like _ in colored regions (e.g. ccstatusline output)."
 (use-package general
   :after evil
   :config
+  ;; Free SPC in motion state so it can serve as leader prefix there.
+  ;; Evil binds SPC to evil-forward-char in motion state by default.
+  (general-define-key :states 'motion "SPC" nil)
   ;; Global leader (Space) and a "mode" leader (SPC m)
   (general-create-definer my/leader
-    :states '(normal visual emacs)
+    :states '(normal visual motion emacs)
     :prefix "SPC"
     :non-normal-prefix "M-SPC")
 
   (general-create-definer my/local-leader
-    :states '(normal visual emacs)
+    :states '(normal visual motion emacs)
     :prefix "SPC m"
     :non-normal-prefix "M-SPC m")
 
