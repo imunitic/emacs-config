@@ -33,6 +33,11 @@
   (add-to-list 'eglot-server-programs
                '((ocaml-ts-mode ocamli-ts-mode) . ("ocamllsp"))))
 
+;; Teach org-mode to fontify #+begin_src ocaml blocks with ocaml-ts-mode.
+;; Default maps "ocaml" -> tuareg, which isn't installed.
+(with-eval-after-load 'org-src
+  (add-to-list 'org-src-lang-modes '("ocaml" . ocaml-ts)))
+
 (with-eval-after-load 'ocaml-ts-mode
   (add-hook 'ocaml-ts-mode-hook #'eglot-ensure)
   (add-hook 'ocamli-ts-mode-hook #'eglot-ensure)
