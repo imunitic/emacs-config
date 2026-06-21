@@ -30,7 +30,16 @@
 
 ;; Default frame configuration: full screen, good-looking title bar on macOS
 (setq frame-resize-pixelwise t)
-(tool-bar-mode -1)                      ; All these tools are in the menu-bar anyway
+(when (boundp 'tool-bar-mode)
+  (tool-bar-mode -1))                   ; All these tools are in the menu-bar anyway
+
+(setq default-frame-alist '((fullscreen . maximized)
+                            ;; (vertical-scroll-bars . nil)
+                            ;; (horizontal-scroll-bars . nil)
+                            (background-color . "#000000")
+                            (foreground-color . "#ffffff")
+                            (ns-appearance . dark)
+                            (ns-transparent-titlebar . t)))
 
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 
