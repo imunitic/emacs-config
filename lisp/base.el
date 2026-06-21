@@ -90,7 +90,12 @@ text, making it look like _ in colored regions (e.g. ccstatusline output)."
   :if (memq system-type '(gnu gnu/linux darwin))
   :commands (vterm vterm-other-window)
   :hook ((vterm-mode . my/vterm-disable-line-numbers)
-         (vterm-mode . my/terminal-nobreak-space-fix))
+         (vterm-mode . my/terminal-nobreak-space-fix)
+         ;; Disable Evil entirely — vterm is a terminal emulator and must
+         ;; receive all keys (including ESC) directly.  evil-emacs-state is
+         ;; not reliable enough: Evil can still switch to insert/normal state
+         ;; and intercept ESC before it reaches the terminal process.
+         (vterm-mode . (lambda () (evil-local-mode -1))))
   :init
   ;; Do not set KITTY_WINDOW_ID here: that causes Claude Code's oX1() to
   ;; return "kitty" → ap5()=true → Kitty keyboard protocol sent → rendering
@@ -497,11 +502,6 @@ text, making it look like _ in colored regions (e.g. ccstatusline output)."
     (setq dired-listing-switches "-alh --group-directories-first")
     (setq insert-directory-program "gls"
           dired-use-ls-dired t))
-
-  ;; Start Emacs fullscreen (choose one)
-  (add-to-list 'initial-frame-alist '(fullscreen . maximized))
-  ;; or
-  ;; (add-to-list 'initial-frame-alist '(fullscreen . fullboth))
 
   ;; y-or-n instead of yes-or-no
   (fset 'yes-or-no-p 'y-or-n-p)
