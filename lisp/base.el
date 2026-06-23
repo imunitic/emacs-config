@@ -102,7 +102,8 @@ text, making it look like _ in colored regions (e.g. ccstatusline output)."
   ;; artifacts.  vterm's default TERM=xterm-256color and no TERM_PROGRAM
   ;; already make oX1() return null (basic-terminal mode), which is correct.
   ;; FORCE_COLOR=3 ensures chalk uses truecolor regardless.
-  (setq vterm-environment '("FORCE_COLOR=3")))
+  (setq vterm-environment '("FORCE_COLOR=3"))
+  (setq vterm-max-scrollback 100000))
 
 (defun my/powerline-setup ()
   (require 'powerline)
