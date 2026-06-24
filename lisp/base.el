@@ -76,9 +76,6 @@
   ;; Silence noisy messages, optional
   (setq eglot-extend-to-xref t))
 
-(defun my/vterm-disable-line-numbers ()
-  (display-line-numbers-mode 0))
-
 (defun my/terminal-nobreak-space-fix ()
   "Render U+00A0 as a plain space in terminal buffers.
 Standalone terminals display NBSP identically to regular space; Emacs
@@ -86,24 +83,6 @@ applies the nobreak-space face (underlined by default) to NBSP in buffer
 text, making it look like _ in colored regions (e.g. ccstatusline output)."
   (face-remap-add-relative 'nobreak-space :underline nil))
 
-(use-package vterm
-  :if (memq system-type '(gnu gnu/linux darwin))
-  :commands (vterm vterm-other-window)
-  :hook ((vterm-mode . my/vterm-disable-line-numbers)
-         (vterm-mode . my/terminal-nobreak-space-fix)
-         ;; Disable Evil entirely — vterm is a terminal emulator and must
-         ;; receive all keys (including ESC) directly.  evil-emacs-state is
-         ;; not reliable enough: Evil can still switch to insert/normal state
-         ;; and intercept ESC before it reaches the terminal process.
-         (vterm-mode . (lambda () (evil-local-mode -1))))
-  :init
-  ;; Do not set KITTY_WINDOW_ID here: that causes Claude Code's oX1() to
-  ;; return "kitty" → ap5()=true → Kitty keyboard protocol sent → rendering
-  ;; artifacts.  vterm's default TERM=xterm-256color and no TERM_PROGRAM
-  ;; already make oX1() return null (basic-terminal mode), which is correct.
-  ;; FORCE_COLOR=3 ensures chalk uses truecolor regardless.
-  (setq vterm-environment '("FORCE_COLOR=3"))
-  (setq vterm-max-scrollback 100000))
 
 (defun my/powerline-setup ()
   (require 'powerline)
@@ -132,11 +111,6 @@ text, making it look like _ in colored regions (e.g. ccstatusline output)."
     (add-to-list 'eshell-visual-commands "lf")
     (add-to-list 'eshell-visual-commands "nvim")))
 
-(use-package eshell-vterm
-  :after eshell
-  :if (memq system-type '(gnu gnu/linux darwin))
-  :commands (eshell-vterm-mode)
-  :hook (eshell-mode . eshell-vterm-mode))
 
 (use-package eshell-z
   :commands (eshell-z)
@@ -350,10 +324,6 @@ text, making it look like _ in colored regions (e.g. ccstatusline output)."
   (idle-highlight-inhibit-commands '(keyboard-quit)) ; don’t flash after quit
   )
 
-(defun my/vterm-new ()
-  "Open a new vterm buffer (never reuses an existing one)."
-  (interactive)
-  (vterm t))
 
 (defun my/reload-config ()
   "Reload the main Emacs configuration."
@@ -440,8 +410,8 @@ text, making it look like _ in colored regions (e.g. ccstatusline output)."
 
   (my/leader
     "o"   '(:ignore t :which-key "open")
-    "ot"  '(vterm        :which-key "vterm")
-    "oT"  '(my/vterm-new :which-key "new vterm"))
+    "ot"  '(ghostel                          :which-key "ghostel")
+    "oT"  '((lambda () (interactive) (ghostel t)) :which-key "new ghostel"))
 
   ;; ========== COMMENT (SPC c) ==========
   ;; Works if you enabled either evil-commentary or evil-nerd-commenter.
