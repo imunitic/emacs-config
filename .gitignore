@@ -31,6 +31,10 @@ org-roam.db
 .org-id-locations
 org-persist/
 
+# Machine-local Lisp modules (per-machine overrides, e.g. org-roam directory
+# layout) — underscore prefix also excludes them from init.el's auto-loader
+lisp/_*.el
+
 # Emacs data files
 bookmarks
 network-security.data

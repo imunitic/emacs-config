@@ -1,5 +1,16 @@
 ;;; tool-roam.el --- Org Roam -*- lexical-binding: t; -*-
 
+(defun org-roam-node-directory (node)
+  "Return NODE's subdirectory relative to `org-roam-directory', or \"\" at the root.
+Custom accessor (not a real struct slot) consumed by
+`org-roam-node-display-template' via \"${directory}\" -- see
+`org-roam-node--format-entry', which resolves any \"${field}\" to a call to
+`org-roam-node-field'."
+  (let ((rel (directory-file-name
+              (file-relative-name (file-name-directory (org-roam-node-file node))
+                                   org-roam-directory))))
+    (if (string= rel ".") "" rel)))
+
 (defun tool-roam--resolve-notes-dir ()
   "Return the absolute path to the Org-roam notes directory.
 Reads ORG_ROAM_DIR at call time so exec-path-from-shell has already run."
@@ -39,10 +50,14 @@ Reads ORG_ROAM_DIR at call time so exec-path-from-shell has already run."
          ("C-c n j" . org-roam-dailies-capture-today))
   :config
   ;; If you're using a vertical completion framework, you might want a more informative completion interface
-  (setq org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+  (setq org-roam-node-display-template
+        (concat "${directory:10} ${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
   (org-roam-db-autosync-mode)
   ;; If using org-roam-protocol
-  (require 'org-roam-protocol))
+  (require 'org-roam-protocol)
+  ;; Optional machine-local directory/category layout — gitignored, see
+  ;; lisp/_tool-roam-local.el. Absent on a fresh clone; silently skipped.
+  (require '_tool-roam-local nil t))
 
 (provide 'tool-roam)
 
