@@ -229,7 +229,14 @@ text, making it look like _ in colored regions (e.g. ccstatusline output)."
   (evil-mode 1)
   ;; visual-line-aware j/k
   (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-  (evil-global-set-key 'motion "k" 'evil-previous-visual-line))
+  (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+  ;; `fundamental-mode' (our `initial-major-mode') never runs
+  ;; `after-change-major-mode-hook', so evil's globalized mode doesn't
+  ;; get a chance to re-enable itself in *scratch* like it does elsewhere.
+  (add-hook 'after-init-hook
+            (lambda ()
+              (when (get-buffer "*scratch*")
+                (with-current-buffer "*scratch*" (evil-local-mode 1))))))
 
 ;;; --- Evil collection (Magit, Dired, SLY, Help, etc.) ----------------------
 (use-package evil-collection
