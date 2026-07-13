@@ -1,12 +1,11 @@
 ;;; base.el --- description -*- lexical-binding: t; -*-
 (use-package ample-theme
   :init
+  (defun my/load-preferred-theme ()
+    (load-theme 'ample-flat t))
   (if (daemonp)
-      (add-hook 'after-make-frame-functions
-                (lambda (frame)
-                  (with-selected-frame frame
-                    (load-theme 'ample-flat t))))
-    (load-theme 'ample-flat t)))
+      (add-hook 'server-after-make-frame-hook #'my/load-preferred-theme)
+    (my/load-preferred-theme)))
 
 (use-package exec-path-from-shell
   :if (or (daemonp) (memq window-system '(mac ns x)))
