@@ -22,7 +22,8 @@
   :if (memq system-type '(gnu gnu/linux darwin berkeley-unix))
   :commands (ghostel ghostel-project)
   :hook ((ghostel-mode . (lambda () (display-line-numbers-mode 0)))
-         (ghostel-mode . my/terminal-nobreak-space-fix))
+         (ghostel-mode . my/terminal-nobreak-space-fix)
+         (ghostel-mode . (lambda () (evil-local-mode -1))))
   :init
   ;; Use plain xterm-256color instead of xterm-ghostty so TERM_PROGRAM=ghostty
   ;; is never advertised — prevents claude-code from activating Kitty keyboard
@@ -38,14 +39,6 @@
                         :inherit (intern (format "term-color-%s" c)))
     (set-face-attribute (intern (format "ghostel-color-bright-%s" c)) nil
                         :inherit (intern (format "term-color-bright-%s" c)))))
-
-(use-package evil-ghostel
-  :straight (evil-ghostel :type git :host github :repo "dakra/ghostel"
-                          :local-repo "ghostel"
-                          :files ("extensions/evil-ghostel/*.el"))
-  :after (ghostel evil)
-  :hook (ghostel-mode . evil-ghostel-mode))
-
 
 (provide 'tool-ghostel)
 ;;; tool-ghostel.el ends here
