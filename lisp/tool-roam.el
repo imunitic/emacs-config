@@ -52,6 +52,27 @@ Reads ORG_ROAM_DIR at call time so exec-path-from-shell has already run."
   ;; If you're using a vertical completion framework, you might want a more informative completion interface
   (setq org-roam-node-display-template
         (concat "${directory:10} ${title:*} " (propertize "${tags:10}" 'face 'org-tag)))
+  ;; `dot' (the org-roam-graph default) lays the graph out as a strict
+  ;; hierarchy, which produces a very wide, minimal-height SVG when the note
+  ;; graph is bushy rather than deep. `neato' is Graphviz's classic
+  ;; stress-majorization "spring" layout -- it sizes width/height from actual
+  ;; connectivity and, unlike `sfdp' (built for graphs with thousands of
+  ;; nodes, trading layout quality for speed), fully converges to a compact
+  ;; result at the size of a personal note vault. Falls back to `dot' if
+  ;; Graphviz's extra layout engines aren't on PATH.
+  (setq org-roam-graph-executable (if (executable-find "neato") "neato" "dot")
+        org-roam-graph-extra-config '(("overlap" . "false")
+                                       ("splines" . "true")))
+  ;; org-roam-graph graphs every link type it finds, not just note-to-note
+  ;; (`id') links -- by default only bare `file' links are hidden. Hide http/
+  ;; https too so external URLs a note references don't show up as graph
+  ;; nodes alongside actual notes.
+  (setq org-roam-graph-link-hidden-types '("file" "http" "https"))
+  ;; Long note titles otherwise stretch each node into a wide, thin ellipse.
+  ;; Wrap at 30 chars instead of truncating at the (100-char) default so
+  ;; titles break onto multiple lines and nodes stay roughly square.
+  (setq org-roam-graph-shorten-titles 'wrap
+        org-roam-graph-max-title-length 30)
   (org-roam-db-autosync-mode)
   ;; If using org-roam-protocol
   (require 'org-roam-protocol)
