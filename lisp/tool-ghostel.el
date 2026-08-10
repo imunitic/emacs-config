@@ -18,7 +18,15 @@
                              ("etc/terminfo/67" "etc/terminfo/67/*")
                              ("etc/terminfo/g"  "etc/terminfo/g/*")
                              ("etc/terminfo/x"  "etc/terminfo/x/*")
-                             ("etc/terminfo/78" "etc/terminfo/78/*")))
+                             ("etc/terminfo/78" "etc/terminfo/78/*")
+                             ;; Shell integration (OSC 7 dirtrack, ghostel_cmd) --
+                             ;; without this, the auto-injected ZDOTDIR/ENV shim
+                             ;; sources a script that isn't in the build dir, and
+                             ;; fails silently: default-directory never leaves ~/.
+                             ("etc/shell" "etc/shell/ghostel.*")
+                             ("etc/shell/bootstrap/bash" "etc/shell/bootstrap/bash/*")
+                             ("etc/shell/bootstrap/fish/vendor_conf.d" "etc/shell/bootstrap/fish/vendor_conf.d/*")
+                             ("etc/shell/bootstrap/zsh/.zshenv" . "etc/shell/bootstrap/zsh/.zshenv")))
   :if (memq system-type '(gnu gnu/linux darwin berkeley-unix))
   :commands (ghostel ghostel-project)
   :hook ((ghostel-mode . (lambda () (display-line-numbers-mode 0)))
