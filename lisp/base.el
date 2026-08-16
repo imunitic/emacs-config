@@ -498,7 +498,7 @@ text, making it look like _ in colored regions (e.g. ccstatusline output)."
   (defun my/set-preferred-font (&optional frame)
     (with-selected-frame (or frame (selected-frame))
       (when (member "Hurmit Nerd Font Mono" (font-family-list))
-        (set-frame-font "Hurmit Nerd Font Mono 16" nil t))))
+        (set-frame-font "Hurmit Nerd Font Mono 18" nil t))))
   (my/set-preferred-font)
   (add-hook 'after-make-frame-functions #'my/set-preferred-font)
 
