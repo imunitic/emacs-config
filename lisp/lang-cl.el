@@ -54,5 +54,13 @@
   :hook
   (prog-mode . rainbow-delimiters-mode))
 
+;; auto-mode-alist's "\.li?sp\'" means "optional i" in regex terms (matches
+;; both .lisp and .lsp), but semantic-symref pastes it into a shell glob
+;; where "?" is a mandatory single-char wildcard, so the derived "*.li?sp"
+;; never matches ".lisp". Register the real extensions explicitly so
+;; xref-find-references works in SLY/Lisp buffers.
+(with-eval-after-load 'semantic/symref/grep
+  (add-to-list 'semantic-symref-filepattern-alist '(lisp-mode "*.lisp" "*.lsp" "*.asd")))
+
 (provide 'lang-cl)
 ;;; lang-cl.el ends here
