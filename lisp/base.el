@@ -80,14 +80,6 @@
   ;; Silence noisy messages, optional
   (setq eglot-extend-to-xref t))
 
-(defun my/terminal-nobreak-space-fix ()
-  "Render U+00A0 as a plain space in terminal buffers.
-Standalone terminals display NBSP identically to regular space; Emacs
-applies the nobreak-space face (underlined by default) to NBSP in buffer
-text, making it look like _ in colored regions (e.g. ccstatusline output)."
-  (face-remap-add-relative 'nobreak-space :underline nil))
-
-
 (defun my/powerline-setup ()
   (require 'powerline)
   (powerline-default-theme))
