@@ -174,9 +174,8 @@ If the new path's directories does not exist, create them."
 (setopt mouse-wheel-tilt-scroll t)
 (setopt mouse-wheel-flip-direction t)
 
-;; We won't set these, but they're good to know about
+(setopt indent-tabs-mode nil)  ; Always indent with spaces, never literal tabs
 ;;
-;; (setopt indent-tabs-mode nil)
 ;; (setopt tab-width 4)
 
 ;; Misc. UI tweaks
