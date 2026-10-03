@@ -18,10 +18,10 @@
 
 ;; ada-mode finds ada_language_server itself via `gnat-find-als' and
 ;; starts eglot through its own `ada-eglot-setup' machinery --
-;; forcing the four backends below to 'eglot is what triggers that,
-;; instead of the generic `eglot-ensure'/`eglot-server-programs'
-;; path, which doesn't know how to hand ALS the right .gpr file or
-;; GPR_PROJECT_PATH.
+;; forcing the diagnostics/xref backends below to 'eglot is what
+;; triggers that, instead of the generic
+;; `eglot-ensure'/`eglot-server-programs' path, which doesn't know how
+;; to hand ALS the right .gpr file or GPR_PROJECT_PATH.
 ;;
 ;; `gnat-lsp-server-exec' pins the exact binary rather than leaving
 ;; `gnat-find-als' to scan PATH/`~/.alire/bin': the `alr install
@@ -52,8 +52,16 @@
    (expand-file-name
     "~/.alire/dev-builds/ada_language_server_26.0.0_46c28e2c/.obj/server/ada_language_server"))
   (ada-diagnostics-backend 'eglot)
-  (ada-face-backend 'eglot)
-  (ada-indent-backend 'eglot)
+  ;; The bundled eglot (Emacs 31.1) has no `eglot-semantic-token-faces',
+  ;; so 'eglot here only yields a "does not support faces" warning on
+  ;; every connect. 'none keeps the default font-lock highlighting.
+  (ada-face-backend 'none)
+  ;; 'eglot here makes RET round-trip to ada_language_server for
+  ;; reindentation on every newline (via wisi-indent-newline-indent),
+  ;; which reformats lines as you type. 'none leaves RET a plain
+  ;; newline; local wisi indent isn't available since
+  ;; ada_mode_wisi_lr1_parse isn't installed/on PATH.
+  (ada-indent-backend 'none)
   (ada-xref-backend 'eglot))
   ;; ada-statement-backend can't be 'eglot; it stays whatever ada-mode
   ;; defaults it to (wisi if ada_mode_wisi_lr1_parse is installed and
