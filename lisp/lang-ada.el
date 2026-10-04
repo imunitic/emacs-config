@@ -62,7 +62,27 @@
   ;; newline; local wisi indent isn't available since
   ;; ada_mode_wisi_lr1_parse isn't installed/on PATH.
   (ada-indent-backend 'none)
-  (ada-xref-backend 'eglot))
+  (ada-xref-backend 'eglot)
+  ;; No auto-casing while typing: ada-mode force-cases identifiers to
+  ;; Mixed_Case, which mangles all-caps entities it has no exception
+  ;; entry for (e.g. GNAT's Standard package `ASCII' -> `Ascii'), and
+  ;; the mangled form then fails the project's -gnatyr style check.
+  ;; Keyword casing stays correct via gnatpp (format-on-save below).
+  (ada-auto-case nil)
+  :config
+  ;;  gnatpp-on-save via ALS (eglot-format-buffer) -- gofmt-like
+  ;;  ergonomics: every save is format-compliant, so style errors
+  ;;  never surface at build time and eglot-format stays a no-op.
+  ;;  Global hook, guarded: silent no-op outside ada-mode, when the
+  ;;  server isn't running, or when the code doesn't parse (ALS
+  ;;  refuses to format invalid syntax).  Guarded on
+  ;;  `eglot-current-server' -- NOT `eglot--managed-p', which doesn't
+  ;;  exist in Emacs 31's bundled eglot (the hook would never fire).
+  (defun my-ada-format-on-save ()
+    (when (derived-mode-p 'ada-mode)
+      (when (and (fboundp 'eglot-current-server) (eglot-current-server))
+        (condition-case nil (eglot-format-buffer) (error nil)))))
+  (add-hook 'before-save-hook #'my-ada-format-on-save))
   ;; ada-statement-backend can't be 'eglot; it stays whatever ada-mode
   ;; defaults it to (wisi if ada_mode_wisi_lr1_parse is installed and
   ;; on PATH, otherwise 'none -- statement motion commands unavailable).
